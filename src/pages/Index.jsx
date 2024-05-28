@@ -1,8 +1,22 @@
 import { Box, Button, Container, Flex, Heading, Image, Input, Stack, Text, Textarea, VStack } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [products] = useState([
+    { id: 1, name: "Sample Product 1", description: "This is a great product that you will love.", price: "$199.99", image: "/images/sample-product1.jpg" },
+    { id: 2, name: "Sample Product 2", description: "This is another great product that you will love.", price: "$299.99", image: "/images/sample-product2.jpg" },
+    // Add more products as needed
+  ]);
+
+  useEffect(() => {
+    const filtered = products.filter(product =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [searchQuery, products]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -13,6 +27,10 @@ const Index = () => {
     e.preventDefault();
     console.log("Form submitted:", formData);
     // Handle form submission logic here
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -38,25 +56,23 @@ const Index = () => {
       {/* Products Section */}
       <Box as="section" py={20} px={4} textAlign="center">
         <Heading size="xl" mb={10}>Our Products</Heading>
+        <Input
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          mb={8}
+        />
         <Flex wrap="wrap" justifyContent="center" gap={8}>
-          {/* Sample Product */}
-          <Box borderWidth="1px" borderRadius="lg" overflow="hidden" maxW="sm">
-            <Image src="/images/sample-product1.jpg" alt="Sample Product 1" />
-            <Box p={6}>
-              <Heading size="md" mb={2}>Sample Product 1</Heading>
-              <Text mb={4}>This is a great product that you will love.</Text>
-              <Text fontWeight="bold">$199.99</Text>
+          {filteredProducts.map(product => (
+            <Box key={product.id} borderWidth="1px" borderRadius="lg" overflow="hidden" maxW="sm">
+              <Image src={product.image} alt={product.name} />
+              <Box p={6}>
+                <Heading size="md" mb={2}>{product.name}</Heading>
+                <Text mb={4}>{product.description}</Text>
+                <Text fontWeight="bold">{product.price}</Text>
+              </Box>
             </Box>
-          </Box>
-          <Box borderWidth="1px" borderRadius="lg" overflow="hidden" maxW="sm">
-            <Image src="/images/sample-product2.jpg" alt="Sample Product 2" />
-            <Box p={6}>
-              <Heading size="md" mb={2}>Sample Product 2</Heading>
-              <Text mb={4}>This is another great product that you will love.</Text>
-              <Text fontWeight="bold">$299.99</Text>
-            </Box>
-          </Box>
-          {/* Add more products as needed */}
+          ))}
         </Flex>
       </Box>
 
